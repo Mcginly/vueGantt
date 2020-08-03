@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title>rasu-bi-view</title>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but rasu-bi-view doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="biview"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
+
+<script>
+  // window.onload = function() {
+  //   function unload () {
+  //     let data = {
+  //       user: 333,
+  //       objectid: 107509,
+  //       objectuid: '20404079-49D9-4068-9DE5-4ECD2C750868',
+  //       actionuid: 'c573451f-5c32-469a-8e0b-a35ee73d80e0',
+  //       action: 0,
+  //       dom: JSON.stringify(document.getElementsByTagName('html')[0].innerHTML)
+  //     }
+  //     sendData(JSON.stringify(data));
+  //     console.log('beforeunload');
+  //     return;
+  //   }
+  //   window.addEventListener('beforeunload', unload, false);
+    
+  //   function sendData (data) {
+  //       let xhr = new XMLHttpRequest();
+  //       xhr.withCredentials = true;
+  //       xhr.addEventListener("readystatechange", function () {
+  //         if (this.readyState === 4) {
+  //           console.log('ok');
+  //         }
+  //       });
+  //       xhr.open("POST", "http://elma-dev:3000/insertaudit");
+  //       xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+  //       xhr.setRequestHeader("content-type", "application/json; charset=utf-8");
+  //       xhr.setRequestHeader("cache-control", "no-cache");
+  //       xhr.send(data);
+  //   }
+
+  //   let data = {
+  //     user: 333,
+  //     objectid: 107509,
+  //     objectuid: '20404079-49D9-4068-9DE5-4ECD2C750868',
+  //     actionuid: 'c573451f-5c32-469a-8e0b-a35ee73d80e0',
+  //     dom: ''
+  //   }
+  //   sendData(JSON.stringify(data));
+  //   console.log('DOMContentLoaded');
+// }
+</script>
