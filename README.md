@@ -1,4 +1,4 @@
-# rasu-bi-view
+# WASD-bi-view
 
 ## Project setup
 ```

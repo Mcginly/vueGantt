@@ -24,15 +24,15 @@
       >
         <template v-slot:activator="{ on, attrs }">
           <a
-            :href="`http://elma/Common/Catalogs/ViewItem/${item.Id}?uid=6513f28b-13a3-4e74-aa8f-010353c88ef2`"
+            :href="`http://wasd/Common/Catalogs/ViewItem/${item.Id}?uid=6513f28b-13a3-4e74-aa8f-010353c88ef2`"
             target="_blank"
             v-bind="attrs"
             v-on="on"
           >
-            <img src="http://elma/Content/Images/x16/process.png" width="16" height="16" class="mt-1" />
+            <img src="http://wasd/Content/Images/x16/process.png" width="16" height="16" class="mt-1" />
           </a>
         </template>
-        <span>Открыть в ELMA</span>
+        <span>Открыть в WASD</span>
       </v-tooltip>
     </template>
     <!-- <template v-slot:item.StartPoint="{ item }">

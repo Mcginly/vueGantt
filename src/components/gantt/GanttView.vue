@@ -72,7 +72,7 @@ export default {
       //   gantt.serverList('dates', await planData.getTestDates('7576'))
       // })
       //
-      gantt.load(`http://elma:3000/proddata/${this.planId}`)
+      gantt.load(`http://wasd:3000/proddata/${this.planId}`)
       //
       // gantt.config.fit_tasks = true
       gantt.init(this.$refs.gantt)
@@ -254,7 +254,7 @@ export default {
           }
           // var formatFunc = gantt.date.date_to_str('%Y-%m-%d')
           // var date = formatFunc(new Date(2013, 05, 29))
-          self.$store.dispatch('setTaskRequirements', task.RASU_Requirement)
+          self.$store.dispatch('setTaskRequirements', task.WASD_Requirement)
           self.$store.dispatch('setTaskHistory', { id: task.task_id, date: task.CreationDate })
           self.$store.dispatch('setTabDialogTask', null)
           self.$store.dispatch('setTaskDialogVisible', true)
@@ -322,7 +322,7 @@ export default {
           function getPosition (e) {
             var posx = 0
             var posy = 0
-            // var elmaApp = elma != undefined ? true : false;
+            // var wasdApp = wasd != undefined ? true : false;
             // eslint-disable-next-line
             if (!e) var e = window.event
             var elm = document.querySelector('.ganttview').getBoundingClientRect() // ganttview .left-container
@@ -697,16 +697,16 @@ export default {
     height: 100%;
   }
   .planTask {
-    background-image: url(http://elma/Content/js/icons/project-task.png);
+    background-image: url(http://wasd/Content/js/icons/project-task.png);
   }
   .planSubPlan {
-    background-image: url(http://elma/Content/js/icons/subproject.png);
+    background-image: url(http://wasd/Content/js/icons/subproject.png);
   }
   .planMilestone {
-    background-image: url(http://elma/Content/js/icons/milestone.png);
+    background-image: url(http://wasd/Content/js/icons/milestone.png);
   }
   .planPhaseTask {
-    background-image: url(http://elma/Content/js/icons/phase-task.png);
+    background-image: url(http://wasd/Content/js/icons/phase-task.png);
   }
   .task_groups {
     background-color: rgb(255, 153, 0) !important;

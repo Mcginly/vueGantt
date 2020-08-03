@@ -40,19 +40,19 @@
       </v-row> -->
       <v-row dense>
         <v-col cols="3">Риски</v-col>
-        <v-col cols="9" class="mx-auto mt-auto">selectedTask.RASU_Risks</v-col>
+        <v-col cols="9" class="mx-auto mt-auto">selectedTask.WASD_Risks</v-col>
       </v-row>
       <v-row dense>
         <v-col cols="3">Код заказа</v-col>
-        <v-col cols="9" class="mx-auto mt-auto">{{ selectedTask.RASU_OrderCode ? selectedTask.RASU_OrderCode : '----' }}</v-col>
+        <v-col cols="9" class="mx-auto mt-auto">{{ selectedTask.WASD_OrderCode ? selectedTask.WASD_OrderCode : '----' }}</v-col>
       </v-row>
       <v-row dense>
         <v-col cols="3">Система</v-col>
-        <v-col cols="9" class="mx-auto mt-auto">{{ selectedTask.RASU_System ? selectedTask.RASU_System : '----' }}</v-col>
+        <v-col cols="9" class="mx-auto mt-auto">{{ selectedTask.WASD_System ? selectedTask.WASD_System : '----' }}</v-col>
       </v-row>
       <v-row dense>
         <v-col cols="3">Стадия проекта</v-col>
-        <v-col cols="9" class="mx-auto mt-auto">selectedTask.RASU_Stage_PM</v-col>
+        <v-col cols="9" class="mx-auto mt-auto">selectedTask.WASD_Stage_PM</v-col>
       </v-row>
       <v-row dense>
         <v-col cols="3">Описание: </v-col>
@@ -178,9 +178,9 @@ export default {
     avatar (user) {
       const find = this.users.find(f => Number(f.id) === Number(user))
       if (find) {
-        return config.ELMA_API + find.avatar
+        return config.WASD_API + find.avatar
       } else {
-        return `${config.ELMA_API}Content/Images/x120/nophoto_120.gif`
+        return `${config.WASD_API}Content/Images/x120/nophoto_120.gif`
       }
     },
     getTaskExecutor (user) {
@@ -200,15 +200,15 @@ export default {
     typeIcon () {
       switch (this.selectedDialogTask.type) {
         case 'subplan':
-          return config.ELMA_API + 'Content/js/icons/subproject.png'
+          return config.WASD_API + 'Content/js/icons/subproject.png'
         case 'task':
-          return config.ELMA_API + 'Content/js/icons/project-task.png'
+          return config.WASD_API + 'Content/js/icons/project-task.png'
         case 'project':
-          return config.ELMA_API + 'Content/js/icons/project-task.png'
+          return config.WASD_API + 'Content/js/icons/project-task.png'
         case 'milestone':
-          return config.ELMA_API + 'Content/js/icons/milestone.png'
+          return config.WASD_API + 'Content/js/icons/milestone.png'
         case 'phase':
-          return config.ELMA_API + 'Content/js/icons/phase-task.png'
+          return config.WASD_API + 'Content/js/icons/phase-task.png'
       }
     },
     status (status) {
@@ -250,37 +250,37 @@ export default {
     statusIcon (status) {
       switch (status.toLowerCase()) {
         case '34387afa-6b70-476f-9d34-748732059003':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=34387afa-6b70-476f-9d34-748732059003'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=34387afa-6b70-476f-9d34-748732059003'
         case 'dd048b73-4e08-404a-b62e-c55222845cc4':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=dd048b73-4e08-404a-b62e-c55222845cc4'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=dd048b73-4e08-404a-b62e-c55222845cc4'
         case '1710de4d-86fa-4072-951a-55ebbdcd5bf1':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=1710de4d-86fa-4072-951a-55ebbdcd5bf1'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=1710de4d-86fa-4072-951a-55ebbdcd5bf1'
         case '37a184b8-a81d-4177-9eb5-4ebe3dfae959':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=37a184b8-a81d-4177-9eb5-4ebe3dfae959'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=37a184b8-a81d-4177-9eb5-4ebe3dfae959'
         case 'fd7993c6-99c7-4b23-83cc-0f576a63c144':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=fd7993c6-99c7-4b23-83cc-0f576a63c144'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=fd7993c6-99c7-4b23-83cc-0f576a63c144'
         case '85707efe-806c-4ec6-8cd6-4d5e4edd8b19':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=85707efe-806c-4ec6-8cd6-4d5e4edd8b19'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=85707efe-806c-4ec6-8cd6-4d5e4edd8b19'
         case '112ea757-36f7-4859-b0d3-6cc0f5a04705':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=112ea757-36f7-4859-b0d3-6cc0f5a04705'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=112ea757-36f7-4859-b0d3-6cc0f5a04705'
         case '46f88008-94cd-4b14-985c-31ba6edeb60e':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=46f88008-94cd-4b14-985c-31ba6edeb60e'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=46f88008-94cd-4b14-985c-31ba6edeb60e'
         case '2968382b-e9be-4e2f-967b-0dce0a67a4c4':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=2968382b-e9be-4e2f-967b-0dce0a67a4c4'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=2968382b-e9be-4e2f-967b-0dce0a67a4c4'
         case 'b9c9f74a-15ec-4337-9916-f02ffec83dd4':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=b9c9f74a-15ec-4337-9916-f02ffec83dd4'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=b9c9f74a-15ec-4337-9916-f02ffec83dd4'
         case '1f6de7ff-03af-401a-a3ca-23af7cab8f65':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=1f6de7ff-03af-401a-a3ca-23af7cab8f65'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=1f6de7ff-03af-401a-a3ca-23af7cab8f65'
         case 'b0b6a339-ba74-4e46-b721-2733d7fb76a9':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=b0b6a339-ba74-4e46-b721-2733d7fb76a9'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=b0b6a339-ba74-4e46-b721-2733d7fb76a9'
         case '70918293-8b84-43be-ad39-181375d51373':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=70918293-8b84-43be-ad39-181375d51373'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=70918293-8b84-43be-ad39-181375d51373'
         case '98ff43bd-b897-41f0-adf2-4eb3b3783851':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=98ff43bd-b897-41f0-adf2-4eb3b3783851'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=98ff43bd-b897-41f0-adf2-4eb3b3783851'
         case 'b4b74155-53c6-432f-8048-fb9a579349af':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=b4b74155-53c6-432f-8048-fb9a579349af'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=b4b74155-53c6-432f-8048-fb9a579349af'
         case 'e498da26-0a25-4d99-a053-01dab75db84a':
-          return config.ELMA_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=e498da26-0a25-4d99-a053-01dab75db84a'
+          return config.WASD_API + 'SDK.Action/Images/EnumObject/b11d6d0a-f07b-40a3-bc49-2cc5a67fbc81?valueid=e498da26-0a25-4d99-a053-01dab75db84a'
       }
     }
   }

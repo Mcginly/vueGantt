@@ -27,10 +27,10 @@ export default {
     async checkToken (state, payload) {
       if (state.token === null) {
         try {
-          const token = await axios.post(`${config.ELMA_API}${config.ELMA_AUTH_PATH}${payload.login}`, payload.pwd, {
+          const token = await axios.post(`${config.WASD_API}${config.WASD_AUTH_PATH}${payload.login}`, payload.pwd, {
             headers: {
               'Content-Type': 'application/json',
-              'ApplicationToken': config.ELMA_API_TOKEN
+              'ApplicationToken': config.WASD_API_TOKEN
             }
           })
           state.token = token.data.AuthToken
@@ -39,7 +39,7 @@ export default {
         }
       } else {
         try {
-          const checkToken = await axios(`${config.ELMA_API}${config.ELMA_CHECK_TOKEN}${state.token}`)
+          const checkToken = await axios(`${config.WASD_API}${config.WASD_CHECK_TOKEN}${state.token}`)
           state.token = checkToken.data.AuthToken
         } catch (error) {
           state.token = null
@@ -64,10 +64,10 @@ export default {
       commit('clearError')
       commit('setLoading', true)
       try {
-        const token = await axios.post(`${config.useProxy ? 'http://' + config.proxyAddress + ':8888/' : ''}${config.ELMA_API}${config.ELMA_AUTH_PATH}${login}`, '"' + pwd + '"', {
+        const token = await axios.post(`${config.useProxy ? 'http://' + config.proxyAddress + ':8888/' : ''}${config.WASD_API}${config.WASD_AUTH_PATH}${login}`, '"' + pwd + '"', {
           headers: {
             'Content-Type': 'application/json',
-            'ApplicationToken': config.ELMA_API_TOKEN
+            'ApplicationToken': config.WASD_API_TOKEN
           }
         })
         if (token.data.AuthToken) {

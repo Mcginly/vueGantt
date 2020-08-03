@@ -58,7 +58,7 @@ export default {
   },
   async getUsersSQL () {
     try {
-      const resp = await axios.get(`${config.useProxy ? config.proxyAddress : ''}${config.API_ADDRESS}/alluserselma/${config.SERVER}`)
+      const resp = await axios.get(`${config.useProxy ? config.proxyAddress : ''}${config.API_ADDRESS}/alluserswasd/${config.SERVER}`)
       return resp.data
     } catch (error) {
       console.log(error)

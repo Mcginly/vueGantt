@@ -124,7 +124,7 @@
             >
               <template v-slot:activator="{ on, attrs }">
                 <a
-                  :href="`http://elma/Documents/Document/DownloadCurrentVersion/${item.Contract}`"
+                  :href="`http://wasd/Documents/Document/DownloadCurrentVersion/${item.Contract}`"
                   target="_blank"
                   style="text-decoration:none;"
                   v-bind="attrs"
@@ -141,7 +141,7 @@
           <v-list-item-content>
             <v-list-item-subtitle class="caption">Договор</v-list-item-subtitle>
             <v-list-item-title>
-              <a :href="`http://elma/Documents/Document/View/${item.Contract}`" target="_blank" style="text-decoration:none;">{{ item.ContractName }}</a></v-list-item-title>
+              <a :href="`http://wasd/Documents/Document/View/${item.Contract}`" target="_blank" style="text-decoration:none;">{{ item.ContractName }}</a></v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-col>

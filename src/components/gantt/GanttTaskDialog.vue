@@ -169,15 +169,15 @@ export default {
     typeIcon () {
       switch (this.selectedDialogTask.type) {
         case 'subplan':
-          return config.ELMA_API + 'Content/js/icons/subproject.png'
+          return config.WASD_API + 'Content/js/icons/subproject.png'
         case 'task':
-          return config.ELMA_API + 'Content/js/icons/project-task.png'
+          return config.WASD_API + 'Content/js/icons/project-task.png'
         case 'project':
-          return config.ELMA_API + 'Content/js/icons/project-task.png'
+          return config.WASD_API + 'Content/js/icons/project-task.png'
         case 'milestone':
-          return config.ELMA_API + 'Content/js/icons/milestone.png'
+          return config.WASD_API + 'Content/js/icons/milestone.png'
         case 'phase':
-          return config.ELMA_API + 'Content/js/icons/phase-task.png'
+          return config.WASD_API + 'Content/js/icons/phase-task.png'
       }
     }
   }

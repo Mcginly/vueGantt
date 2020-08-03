@@ -80,7 +80,7 @@
               <span>{{ item.CompletePercent + '%' }}</span>
             </v-tooltip>
           </template>
-          <!-- /Modules/EleWise.ELMA.Projects.Web/Content/Images/x16/project_plan.png  /Modules/EleWise.ELMA.Projects.Web/Content/Images/x16/projects.png -->
+          <!-- /Modules/EleWise.WASD.Projects.Web/Content/Images/x16/project_plan.png  /Modules/EleWise.WASD.Projects.Web/Content/Images/x16/projects.png -->
           <template v-slot:item.href="{ item }">
             <span>
               <v-tooltip bottom :open-delay="500">
@@ -95,7 +95,7 @@
                     <v-icon small>fa fa-external-link</v-icon>
                   </a>
                 </template>
-                <span>Открыть проект в Elma</span>
+                <span>Открыть проект в WASD</span>
               </v-tooltip>
             </span>
           </template>
@@ -141,10 +141,10 @@ export default {
       // console.log(percent, percent.replace(/\D+/g, ''))
     },
     getPlanImage () {
-      return config.ELMA_API + 'Modules/EleWise.ELMA.Projects.Web/Content/Images/x16/project_plan.png'
+      return config.WASD_API + 'Modules/EleWise.WASD.Projects.Web/Content/Images/x16/project_plan.png'
     },
     getProjectUrl (item) {
-      return config.ELMA_API + 'Projects/Project/Index/' + item.Id
+      return config.WASD_API + 'Projects/Project/Index/' + item.Id
     }
   }
 }

@@ -37,7 +37,7 @@
           <v-divider v-if="item.attach" />
           <div v-if="item.attach" class="caption">
             <a
-              :href="`http://elma/SDK.Action/BinaryFiles/Download/${JSON.parse(item.attach).file}`"
+              :href="`http://wasd/SDK.Action/BinaryFiles/Download/${JSON.parse(item.attach).file}`"
               style="text-decoration: none;"
             >
               <v-icon small>fa fa-paperclip</v-icon>
@@ -69,7 +69,7 @@
                 <v-row dense>
                   <div v-if="item.ActionObjectId" class="ml-1">
                     <a
-                      :href="`http://elma/Tasks/Question/QuestionExec/${item.ActionObjectId}`"
+                      :href="`http://wasd/Tasks/Question/QuestionExec/${item.ActionObjectId}`"
                       target="_blank"
                       style="text-decoration: none;"
                     >
@@ -82,7 +82,7 @@
                   <v-spacer />
                   <div v-if="item.info" class="caption mr-1">
                     <a
-                      :href="`http://elma/SDK.Action/BinaryFiles/Download/${item.info.file}`"
+                      :href="`http://wasd/SDK.Action/BinaryFiles/Download/${item.info.file}`"
                       style="text-decoration: none;"
                     >
                       <v-icon small>fa fa-paperclip</v-icon>
@@ -100,7 +100,7 @@
                   <v-spacer />
                   <div v-if="item.info" class="caption mr-1">
                     <a
-                      :href="`http://elma/SDK.Action/BinaryFiles/Download/${item.info.file}`"
+                      :href="`http://wasd/SDK.Action/BinaryFiles/Download/${item.info.file}`"
                       style="text-decoration: none;"
                     >
                       <v-icon small>fa fa-paperclip</v-icon>

@@ -33,7 +33,7 @@
       <div class="d-flex align-center">
         <v-img
           style="cursor: pointer;"
-          alt="RASU Logo"
+          alt="WASD Logo"
           class="shrink mr-2"
           contain
           src="./assets/logo_start_main.png"
@@ -257,7 +257,7 @@ export default {
       })
     },
     avatar () {
-      return this.userLdap ? config.ELMA_API + this.userLdap.avatar : `${config.ELMA_API}Content/Images/x120/nophoto_120.gif`
+      return this.userLdap ? config.WASD_API + this.userLdap.avatar : `${config.WASD_API}Content/Images/x120/nophoto_120.gif`
     },
     handleFullScreen () {
       utils.toggleFullScreen()

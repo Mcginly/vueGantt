@@ -93,7 +93,7 @@
         <tbody>
           <tr v-for="(item, index) in items" :key="item.Id">
             <td>{{ index + 1 }}</td>
-            <td> <a :href="`http://elma/Projects/Project/Index/${item.Id}`" target="_blank" rel="noopener noreferrer">{{ item.Name }}</a></td>
+            <td> <a :href="`http://wasd/Projects/Project/Index/${item.Id}`" target="_blank" rel="noopener noreferrer">{{ item.Name }}</a></td>
             <td>{{ item.ExecuteTasks }}</td>
             <td>{{ item.ActiveTasksCount }}</td>
             <td>0</td>
