@@ -9,7 +9,7 @@ module.exports = {
     {
       'Id': '1116',
       'CurrentPlan': '11922',
-      'Name': 'Разработка проектной документации для энергоблоков №1, 2 Курской АЭС-2',
+      'Name': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       'ExecuteTasks': 578,
       'ActiveTasksCount': 248,
       'DoneTasks': 330,
@@ -25,7 +25,7 @@ module.exports = {
     {
       'Id': '1415',
       'CurrentPlan': '9495',
-      'Name': 'Изготовление и поставка АСУ ТП АЭС Руппур эб. №1, №2',
+      'Name': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
       'ExecuteTasks': 403,
       'ActiveTasksCount': 118,
       'DoneTasks': 444,
@@ -41,7 +41,7 @@ module.exports = {
     {
       'Id': '1416',
       'CurrentPlan': '13535',
-      'Name': 'Модернизация СКУ энергоблока №1 Калининской АЭС',
+      'Name': 'cccccccccccccccccccccccccccccccccccccccccccccccccccc',
       'ExecuteTasks': 690,
       'ActiveTasksCount': 149,
       'DoneTasks': 757,
@@ -57,7 +57,7 @@ module.exports = {
     {
       'Id': '1516',
       'CurrentPlan': '10708',
-      'Name': 'Разработка технического проекта АСУ ТП АЭС АККУЮ',
+      'Name': 'dddddddddddddddddddddddddddddddddddddddddddddddddddd',
       'ExecuteTasks': 5,
       'ActiveTasksCount': 5,
       'DoneTasks': 0,
@@ -73,7 +73,7 @@ module.exports = {
     {
       'Id': '1617',
       'CurrentPlan': '11112',
-      'Name': 'Изготовление и поставка системы АСУТП для э/б №2 ЛЕН АЭС-2',
+      'Name': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
       'ExecuteTasks': 709,
       'ActiveTasksCount': 126,
       'DoneTasks': 574,
@@ -89,7 +89,7 @@ module.exports = {
     {
       'Id': '1920',
       'CurrentPlan': '11920',
-      'Name': 'АЭС «Куданкулам-3,4»',
+      'Name': 'ffffffffffffffffffffffffff',
       'ExecuteTasks': 623,
       'ActiveTasksCount': 532,
       'DoneTasks': 543,
@@ -105,7 +105,7 @@ module.exports = {
     {
       'Id': '2021',
       'CurrentPlan': '11214',
-      'Name': 'Проектирование АСУ ТП АЭС \'Ханхикиви-1\'',
+      'Name': 'ggggggggggggggggggggggggggggggggggg',
       'ExecuteTasks': 39,
       'ActiveTasksCount': 14,
       'DoneTasks': 25,
@@ -121,7 +121,7 @@ module.exports = {
     {
       'Id': '2022',
       'CurrentPlan': '13644',
-      'Name': 'АСКУ МФР',
+      'Name': 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh',
       'ExecuteTasks': 10,
       'ActiveTasksCount': 4,
       'DoneTasks': 6,
@@ -137,7 +137,7 @@ module.exports = {
     {
       'Id': '2122',
       'CurrentPlan': '10001',
-      'Name': 'АСУ ТП АЭС \'Пакш-2\'',
+      'Name': 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii',
       'ExecuteTasks': 168,
       'ActiveTasksCount': 51,
       'DoneTasks': 120,
@@ -153,7 +153,7 @@ module.exports = {
     {
       'Id': '2123',
       'CurrentPlan': '11924',
-      'Name': 'Изготовление, поставка и ввод в действие АСУ ТП энергоблоков №1-4 АЭС \'Эль-Дабаа\'',
+      'Name': 'jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj',
       'ExecuteTasks': 218,
       'ActiveTasksCount': 133,
       'DoneTasks': 123,
@@ -169,7 +169,7 @@ module.exports = {
     {
       'Id': '2223',
       'CurrentPlan': '13031',
-      'Name': 'Разработка ПО СВУ и интеграция СВУ с подсистемами АСУ ТП энергоблоков №1,2 Белорусской АЭС',
+      'Name': 'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk',
       'ExecuteTasks': 39,
       'ActiveTasksCount': 14,
       'DoneTasks': 25,
@@ -185,7 +185,7 @@ module.exports = {
     {
       'Id': '2224',
       'CurrentPlan': '11919',
-      'Name': 'НВАЭС2-2',
+      'Name': 'llllllllllllllllllllllllllllllllllllllllllllllllllllllllll',
       'ExecuteTasks': 76,
       'ActiveTasksCount': 19,
       'DoneTasks': 73,
@@ -201,7 +201,7 @@ module.exports = {
     {
       'Id': '2325',
       'CurrentPlan': '13738',
-      'Name': 'Изготовление и поставка оборудования АСУ ТП для энергоблоков № 1 и № 2 Курской АЭС -2 (поставка)',
+      'Name': 'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm',
       'ExecuteTasks': 108,
       'ActiveTasksCount': 80,
       'DoneTasks': 25,
@@ -217,7 +217,7 @@ module.exports = {
     {
       'Id': '2425',
       'CurrentPlan': '10910',
-      'Name': 'ИЗГОТОВЛЕНИЕ И ПОСТАВКА КОМПЛЕКСА ОБОРУДОВАНИЯ АВТОМАТИЗИРОВАННОЙ СИСТЕМЫ УПРАВЛЕНИЯ ТЕХНОЛОГИЧЕСКИМ ПРОЦЕССОМ (АСУ ТП) ДЛЯ ЭНЕРГОБЛОКОВ №№ 1, 2, 3, 4 И ОБЩЕСТАНЦИОННЫХ СИСТЕМ АЭС «АККУЮ»',
+      'Name': 'nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn',
       'ExecuteTasks': 203,
       'ActiveTasksCount': 45,
       'DoneTasks': 173,
@@ -233,7 +233,7 @@ module.exports = {
     {
       'Id': '3536',
       'CurrentPlan': '8992',
-      'Name': 'АЭС Узбекистан - Стадия PRESALE',
+      'Name': 'oooooooooooooooooooooooooooooo',
       'ExecuteTasks': 14,
       'ActiveTasksCount': 9,
       'DoneTasks': 5,

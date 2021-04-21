@@ -1,22 +1,24 @@
 <template>
-  <v-app>
+  <v-app id="mainappdiv">
     <v-btn
-      v-if="isUserLoggedIn"
+      v-if="isUserLoggedIn && isUserAdmin"
       fab
-      dark
       falt
       fixed
       class="setting-fab rounded-r-xl"
-      color="primary"
+      color="wasd"
       @click="openThemeSettings"
     >
       <v-icon small>fa fa-angle-right</v-icon>
     </v-btn>
+    <!-- правое меню -->
     <v-navigation-drawer
       v-model="drawerRight"
       app
       clipped
       right
+      fixed
+      temporary
       width="300"
       v-if="isUserLoggedIn"
     >
@@ -26,14 +28,14 @@
     <v-app-bar
       app
       clipped-right
-      color="primary"
-      dark
+      color="wasd"
+      class="elevation-1"
     >
       <!-- <v-app-bar-nav-icon @click.stop="drawer = !drawer" /> -->
       <div class="d-flex align-center">
         <v-img
           style="cursor: pointer;"
-          alt="WASD Logo"
+          alt="wasd Logo"
           class="shrink mr-2"
           contain
           src="./assets/logo_start_main.png"
@@ -41,13 +43,17 @@
           width="156"
           @click.stop="drawer = !drawer"
         />
-        <!-- <h4 class="display-0">АО "РАСУ"</h4> -->
+        <!-- <h4 class="display-0">АО "WASD"</h4> -->
       </div>
       <v-spacer />
       <div class="d-flex align-center justify-end" v-if="isUserLoggedIn">
-        <h4 class="display-0">
-          {{ pageHeader }}
-        </h4>
+        <v-tooltip bottom :open-delay="500">
+          <template v-slot:activator="{ on, attrs }">
+            <h4 class="display-0" v-html="pageHeader" v-on="on" v-bind="attrs">
+            </h4>
+          </template>
+          <span> {{ getPublicAuthorAndDate() }} </span>
+        </v-tooltip>
       </div>
 
       <v-spacer />
@@ -89,13 +95,14 @@
         <span>Развернуть на весь экран</span>
       </v-tooltip>
 
-      <v-btn
+      <!-- <v-btn
         icon
         @click="drawerRight = !drawerRight"
         v-if="isUserLoggedIn"
       >
         <v-icon>{{ !drawerRight ? 'fa fa-angle-double-left' : 'fa fa-angle-double-right' }}</v-icon>
-      </v-btn>
+      </v-btn> -->
+
       <v-btn
         icon
         @click="toggleToolbar()"
@@ -104,7 +111,8 @@
         <v-icon>{{ !showToolbar ? 'fa fa-angle-double-down' : 'fa fa-angle-double-up' }}</v-icon>
       </v-btn>
       <template v-slot:extension v-if="showToolbar">
-        <ganttTopMenu />
+        <ganttTopMenu v-if="$route.params.plan_id" />
+        <wikiTopMenu v-if="$route.name === 'wiki'" />
       </template>
     </v-app-bar>
 
@@ -113,7 +121,7 @@
       app
       absolute
       temporary
-      v-if="isUserLoggedIn"
+      v-if="isUserLoggedIn && isUserAdmin"
     >
       <v-list dense>
         <v-list-item>
@@ -122,7 +130,7 @@
           </v-list-item-content>
         </v-list-item>
         <v-divider />
-        <v-list-item to="/" @click="toHome()">
+        <v-list-item :disabled="$route.name === 'home'" @click="toHome()">
           <v-list-item-action>
             <v-icon>fa fa-home</v-icon>
           </v-list-item-action>
@@ -130,6 +138,30 @@
             <v-list-item-title>Главная страница</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item>
+        </v-list-item>
+        <v-list-item>
+          <v-list-item-content>
+            <span>Отчеты</span>
+          </v-list-item-content>
+        </v-list-item>
+        <v-divider />
+        <v-list-item :disabled="$route.name === 'requirements'" @click="toRequirements()">
+          <v-list-item-action>
+            <v-icon>fas fa-file-contract</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Отчет по обязательствам</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <!-- <v-list-item :disabled="$route.name === 'wiki'" @click="toWiki()">
+          <v-list-item-action>
+            <v-icon>fa fa-home</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>База знаний</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item> -->
       </v-list>
     </v-navigation-drawer>
 
@@ -147,14 +179,14 @@
       <router-view />
     </v-main>
 
-    <v-navigation-drawer
+    <!-- <v-navigation-drawer
       v-model="right"
       fixed
       right
       temporary
-    />
-
-    <template v-if="error">
+    /> -->
+    <messages />
+    <!-- <template v-if="error">
       <v-snackbar
         color="error"
         :multi-line="true"
@@ -184,17 +216,17 @@
           Закрыть
         </v-btn>
       </v-snackbar>
-    </template>
+    </template> -->
 
     <v-footer
       app
       inset
-      color="primary"
-      class="white--text"
+      color="wasd"
     >
-      <span>РАСУ</span>
+      <span v-if="loading && readyForImport" style="color: #616161;">{{ `Записано элементов: ${importCount} из ${taskCount}` }}</span>
+      <span v-else style="color: #616161;">{{ taskCount ? `Задач на плане: ${taskCount} из ${allTasksCount}` : '' }}</span>
       <v-spacer />
-      <span>&copy; {{ new Date().getFullYear() }}</span>
+      <span class="caption" style="color: #616161;">WASD &copy; {{ new Date().getFullYear() }}</span>
     </v-footer>
 
   </v-app>
@@ -202,22 +234,27 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import rightMenu from './components/RightMenu'
 import utils from './config/utils'
 import config from './config/config'
 import ganttTopMenu from './components/gantt/GanttTopMenu'
+import wikiTopMenu from './components/wiki/WikiTopMenu'
+import messages from './components/gantt/Dialogs/Messages'
 // eslint-disable-next-line
 import { gantt } from 'dhtmlx-gantt'
 
 export default {
-  name: 'biview',
+  name: 'wasdview',
   components: {
     rightMenu,
-    ganttTopMenu
+    ganttTopMenu,
+    wikiTopMenu,
+    messages
   },
   data: () => ({
     drawer: false,
-    drawerRight: false,
+    // drawerRight: false,
     right: false,
     left: false,
     expanded: false
@@ -226,29 +263,68 @@ export default {
     ...mapGetters([
       'loading',
       'isUserLoggedIn',
-      'error',
+      // 'error',
       'pageHeader',
-      'success',
+      // 'success',
       'user',
       'userLdap',
+      'isUserAdmin',
       'users',
-      'showToolbar'
+      'showToolbar',
+      'taskCount',
+      'allTasksCount',
+      'readyForImport',
+      'importCount',
+      'publicAuthor',
+      'publicDate'
+    ]),
+    ...mapFields([
+      'drawerRight'
     ])
   },
   async beforeCreate () {
     try {
       const projects = await utils.getProjects()
-      const users = await utils.getUsersSQL()
-      this.$store.dispatch('setUsers', users)
+      if (!this.users) {
+        const users = await utils.getUsersSQL()
+        this.$store.dispatch('setUsers', users)
+        const currentUser = users.find(f => f.login === this.user)
+        this.$store.dispatch('setUserLdap', currentUser)
+      } else {
+        const currentUser = this.users.find(f => f.login === this.user)
+        this.$store.dispatch('setUserLdap', currentUser)
+      }
       this.$store.dispatch('setProjects', projects.data)
-      const currentUser = users.find(f => f.login === this.user)
-      this.$store.dispatch('setUserLdap', currentUser)
-      // console.log(currentUser)
+      // console.log(projects.data)
     } catch (error) {
       console.log(error)
     }
   },
   methods: {
+    // taskCount () {
+    //   if (gantt) {
+    //     return gantt.getVisibleTaskCount()
+    //   } else {
+    //     return ''
+    //   }
+    // },
+    getPublicAuthorAndDate () {
+      if (this.users !== null) {
+        var pUser = this.users.find(f => Number(f.id) === Number(this.publicAuthor))
+        var date = new Date(this.publicDate).toLocaleDateString()
+        if (pUser) {
+          var result = `Автор публикации: ${pUser.fullName}, дата публикации: ${date}`
+          return result
+        } else {
+          return ` `
+        }
+      }
+      // if (find) {
+      //   return find.shortName
+      // } else {
+      //   return ''
+      // }
+    },
     toggleToolbar () {
       this.$store.dispatch('setShowToolbar', !this.showToolbar)
       this.$nextTick(() => {
@@ -257,7 +333,7 @@ export default {
       })
     },
     avatar () {
-      return this.userLdap ? config.WASD_API + this.userLdap.avatar : `${config.WASD_API}Content/Images/x120/nophoto_120.gif`
+      return this.userLdap ? config.wasd_API + this.userLdap.avatar : `${config.wasd_API}Content/Images/x120/nophoto_120.gif`
     },
     handleFullScreen () {
       utils.toggleFullScreen()
@@ -265,6 +341,16 @@ export default {
     },
     toHome () {
       this.$store.dispatch('setPageHeader', '')
+      window.location.href = '/'
+      // console.log(this.$route.name)
+    },
+    toRequirements () {
+      window.location.href = '/reports/requirements'
+    },
+    toWiki () {
+      // this.$store.dispatch('setPageHeader', 'WIKI')
+      window.location.href = '/wiki'
+      // console.log(this.$route.name)
     },
     openThemeSettings () {
       this.$vuetify.goTo(0)
@@ -272,12 +358,6 @@ export default {
     },
     rightMenu () {
       this.right = !this.right
-    },
-    closeError () {
-      this.$store.dispatch('clearError')
-    },
-    closeSuccess () {
-      this.$store.dispatch('setSuccess', null)
     },
     logout () {
       this.drawer = false

@@ -155,7 +155,7 @@ export default {
   created () {
     if (this.isUserLoggedIn) {
       if (!this.portfolio) {
-        console.log(utils.getPeriodFormat(this.$store.getters.selectedPeriod.id))
+        // console.log(utils.getPeriodFormat(this.$store.getters.selectedPeriod.id))
         this.$store.dispatch('setPeriodLabel', utils.labelDataFormat(utils.getPeriodFormat(this.$store.getters.selectedPeriod.id)))
         this.$store.dispatch('setPageHeader', 'Портфель проектов (' + this.periodLabel.begin + ' - ' + this.periodLabel.end + ')')
         this.$store.dispatch('setPortfolio', utils.getPeriodFormat(this.$store.getters.selectedPeriod.id))

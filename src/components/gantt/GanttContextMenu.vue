@@ -82,7 +82,7 @@ export default {
         // get the window current inner height and width
         let { innerHeight, innerWidth } = window
         // get the component height and width through element.getClientRects
-        console.log(this.$el)
+        // console.log(this.$el)
         let height = 500
         let width = 500
         // let { height, width } = this.$el.getBoundingClientRect()[0]; //getBoundingClientRect getClientRects
@@ -117,7 +117,7 @@ export default {
             // so you have to validate
             if (Array.isArray(refs)) {
               let el = refs[0]
-              console.log(el)
+              // console.log(el)
               // then attach click event and pass an arrow function as a the
               // event handler callback
               el.addEventListener('click', () => {

@@ -6,9 +6,41 @@ export default {
     token: null,
     user: null,
     userLdap: null,
-    users: null
+    users: null,
+    allAuthors: [],
+    allExecutors: [],
+    isUserAdmin: false
   },
   mutations: {
+    setUserAdmin (state, payload) {
+      state.isUserAdmin = payload
+    },
+    setAllAuthors (state, payload) {
+      let users = state.users
+      let returnArr = []
+      for (let i = 0; i < payload.length; i++) {
+        const element = payload[i]
+        const user = users.find(f => f.id === element)
+        if (user) {
+          returnArr.push(user)
+        }
+      }
+      // console.log('allAuthors', payload, returnArr)
+      state.allAuthors = returnArr
+    },
+    setAllExecutors (state, payload) {
+      let users = state.users
+      let returnArr = []
+      for (let i = 0; i < payload.length; i++) {
+        const element = payload[i]
+        const user = users.find(f => f.id === element)
+        if (user) {
+          returnArr.push(user)
+        }
+      }
+      // console.log('allExecutors', payload, returnArr)
+      state.allExecutors = returnArr
+    },
     setUserLdap (state, payload) {
       state.userLdap = payload
     },
@@ -27,10 +59,10 @@ export default {
     async checkToken (state, payload) {
       if (state.token === null) {
         try {
-          const token = await axios.post(`${config.WASD_API}${config.WASD_AUTH_PATH}${payload.login}`, payload.pwd, {
+          const token = await axios.post(`${config.useProxy ? config.proxyAddress : ''}${config.wasd_WEB_API}${config.wasd_AUTH_PATH}${payload.login}`, payload.pwd, { // wasd_API - вернуть после отладки
             headers: {
               'Content-Type': 'application/json',
-              'ApplicationToken': config.WASD_API_TOKEN
+              'ApplicationToken': config.wasd_API_TOKEN
             }
           })
           state.token = token.data.AuthToken
@@ -39,7 +71,7 @@ export default {
         }
       } else {
         try {
-          const checkToken = await axios(`${config.WASD_API}${config.WASD_CHECK_TOKEN}${state.token}`)
+          const checkToken = await axios(`${config.useProxy ? config.proxyAddress : ''}${config.wasd_WEB_API}${config.wasd_CHECK_TOKEN}${state.token}`) // wasd_API - вернуть после отладки
           state.token = checkToken.data.AuthToken
         } catch (error) {
           state.token = null
@@ -48,6 +80,18 @@ export default {
     }
   },
   actions: {
+    setToken ({ commit }, payload) {
+      commit('setToken', payload)
+    },
+    setUserAdmin ({ commit }, payload) {
+      commit('setUserAdmin', payload)
+    },
+    setAllAuthors ({ commit }, payload) {
+      commit('setAllAuthors', payload)
+    },
+    setAllExecutors ({ commit }, payload) {
+      commit('setAllExecutors', payload)
+    },
     setUserLdap ({ commit }, payload) {
       commit('setUserLdap', payload)
     },
@@ -58,16 +102,19 @@ export default {
       commit('setUser', null)
     },
     setUser ({ commit }, payload) {
+      if (payload === 'AVAleksandrov') {
+        commit('setUserAdmin', true)
+      }
       commit('setUser', payload)
     },
     async loginUser ({ commit }, { login, pwd }) {
       commit('clearError')
       commit('setLoading', true)
       try {
-        const token = await axios.post(`${config.useProxy ? 'http://' + config.proxyAddress + ':8888/' : ''}${config.WASD_API}${config.WASD_AUTH_PATH}${login}`, '"' + pwd + '"', {
+        const token = await axios.post(`${config.useProxy ? config.proxyAddress : ''}${config.wasd_API}${config.wasd_AUTH_PATH}${login}`, '"' + pwd + '"', {
           headers: {
             'Content-Type': 'application/json',
-            'ApplicationToken': config.WASD_API_TOKEN
+            'ApplicationToken': config.wasd_API_TOKEN
           }
         })
         if (token.data.AuthToken) {
@@ -93,27 +140,38 @@ export default {
       commit('setLoading', true)
       commit('setSuccess', null)
       try {
-        const resolve = await axios.post(`${config.useProxy ? 'http://' + config.proxyAddress + ':8888/' : ''}${config.API_ADDRESS}${config.LDAP_AUTH}`, { user: user, pwd: pwd }, {
+        const resolve = await axios.post(`${config.useProxy ? config.proxyAddress : ''}${config.API_ADDRESS}${config.LDAP_AUTH}`, { user: user, pwd: pwd }, {
           headers: {
             'Content-Type': 'application/json'
           }
         })
+        console.log('resolve :', resolve)
         if (resolve.data.error) {
           commit('setUserLdap', null)
           commit('setUser', null)
           commit('setLoading', false)
           commit('setError', 'Пользователь не найден или введен неверный логин/пароль')
         } else {
+          // console.log(resolve.data)
           if (resolve.data.type === 1) {
-            commit('setUserLdap', null)
-            commit('setUser', null)
+            const currentUser = state.users.find(f => f.login === resolve.data.data.all.sAMAccountName)
+            commit('setUserLdap', currentUser)
+            commit('setUser', resolve.data.data.all.sAMAccountName)
             commit('setLoading', false)
-            commit('setError', resolve.data.data.name + '! За разрешением на доступ к ресурсу обратитесь в службу безопасности.')
+            commit('setSuccess', 'Текущий пользователь: ' + resolve.data.data.name)
+            // commit('setUserLdap', null)
+            // commit('setUser', null)
+            // commit('setLoading', false)
+            // commit('setError', resolve.data.data.name + '! За разрешением на доступ обратитесь к Вашему руководителю проектов.')
           } else {
             // console.log(resolve.data.data.all.sAMAccountName)
             const currentUser = state.users.find(f => f.login === resolve.data.data.all.sAMAccountName)
             commit('setUserLdap', currentUser)
             commit('setUser', resolve.data.data.all.sAMAccountName)
+            // AVAleksandrov
+            if (resolve.data.data.all.sAMAccountName === 'AVAleksandrov') {
+              commit('setUserAdmin', true)
+            }
             commit('setLoading', false)
             commit('setSuccess', 'Текущий пользователь: ' + resolve.data.data.name)
           }
@@ -128,6 +186,15 @@ export default {
     }
   },
   getters: {
+    isUserAdmin (state) {
+      return state.isUserAdmin
+    },
+    allExecutors (state) {
+      return state.allExecutors
+    },
+    allAuthors (state) {
+      return state.allAuthors
+    },
     userLdap (state) {
       return state.userLdap
     },

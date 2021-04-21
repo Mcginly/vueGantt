@@ -2,7 +2,7 @@
 <template>
   <v-dialog
     v-model="taskDialogVisible"
-    max-width="1000"
+    max-width="1200"
     persistent
   >
     <v-card>
@@ -43,20 +43,19 @@
       <v-card-text>
         <v-tabs
           v-model="tabDialogTask"
-          background-color="primary"
-          active-class="blue-grey darken-1"
-          dark
+          background-color="wasd"
+          active-class="blue-grey lighten-5"
           height="30"
         >
           <!-- <v-tabs-slider color="red lighten-1"></v-tabs-slider> -->
           <v-tab>
             <span class="caption">{{ `Общая информация` }}</span>
           </v-tab>
-          <v-tab :disabled="!predecessor">
-            <span class="caption">{{ `Предшественники` }}</span>
+          <v-tab :disabled="!predecessor && !successor">
+            <span class="caption">{{ `Связи` }}</span>
           </v-tab>
-          <v-tab :disabled="!successor">
-            <span class="caption">{{ `Последователи` }}</span>
+          <v-tab :disabled="!workload">
+            <span class="caption">{{ `Загрузка по портфелю` }}</span>
           </v-tab>
           <v-tab :disabled="!taskRequirements">
             <span class="caption">{{ `Обязательства` }}</span>
@@ -79,10 +78,17 @@
             <generalInfo />
           </v-tab-item>
           <v-tab-item>
-            <predecessorsTable />
+            <v-row>
+              <v-col cols="6">
+                <predecessorsTable />
+              </v-col>
+              <v-col cols="6">
+                <successorsTable />
+              </v-col>
+            </v-row>
           </v-tab-item>
           <v-tab-item>
-            <successorsTable />
+            <resourcesTable />
           </v-tab-item>
           <v-tab-item>
             <requirementsTable />
@@ -98,7 +104,8 @@
       <v-card-actions>
         <v-spacer />
         <v-btn
-          color="primary"
+          color="wasdmedium"
+          dark
           small
           @click="taskDialogVisible = false"
         >
@@ -113,6 +120,7 @@
 import { mapGetters } from 'vuex'
 import successorsTable from './DialogTables/SuccessorsTable'
 import predecessorsTable from './DialogTables/PredecessorsTable'
+import resourcesTable from './DialogTables/ResourcesTable'
 import taskHistory from './DialogTables/TasksHistory'
 import requirementsTable from './DialogTables/RequirementsTable'
 import generalInfo from './DialogTables/GeneralInfo'
@@ -123,6 +131,7 @@ export default {
   components: {
     successorsTable,
     predecessorsTable,
+    resourcesTable,
     taskHistory,
     requirementsTable,
     generalInfo
@@ -140,7 +149,8 @@ export default {
       'taskeditform',
       'selectedTask',
       'selectedDialogTask',
-      'taskRequirements'
+      'taskRequirements',
+      'workload'
     ]),
     tabDialogTask: {
       get () {
@@ -161,6 +171,7 @@ export default {
   },
   methods: {
     locateTask (task) {
+      this.$store.dispatch('setIsMainTask', true)
       // eslint-disable-next-line
       gantt.selectTask(task.id)
       // eslint-disable-next-line
@@ -169,15 +180,15 @@ export default {
     typeIcon () {
       switch (this.selectedDialogTask.type) {
         case 'subplan':
-          return config.WASD_API + 'Content/js/icons/subproject.png'
+          return config.wasd_API + 'Content/js/icons/subproject.png'
         case 'task':
-          return config.WASD_API + 'Content/js/icons/project-task.png'
+          return config.wasd_API + 'Content/js/icons/project-task.png'
         case 'project':
-          return config.WASD_API + 'Content/js/icons/project-task.png'
+          return config.wasd_API + 'Content/js/icons/project-task.png'
         case 'milestone':
-          return config.WASD_API + 'Content/js/icons/milestone.png'
+          return config.wasd_API + 'Content/js/icons/milestone.png'
         case 'phase':
-          return config.WASD_API + 'Content/js/icons/phase-task.png'
+          return config.wasd_API + 'Content/js/icons/phase-task.png'
       }
     }
   }

@@ -37,7 +37,7 @@
           <v-divider v-if="item.attach" />
           <div v-if="item.attach" class="caption">
             <a
-              :href="`http://wasd/SDK.Action/BinaryFiles/Download/${JSON.parse(item.attach).file}`"
+              :href="`${server()}SDK.Action/BinaryFiles/Download/${JSON.parse(item.attach).file}`"
               style="text-decoration: none;"
             >
               <v-icon small>fa fa-paperclip</v-icon>
@@ -69,7 +69,7 @@
                 <v-row dense>
                   <div v-if="item.ActionObjectId" class="ml-1">
                     <a
-                      :href="`http://wasd/Tasks/Question/QuestionExec/${item.ActionObjectId}`"
+                      :href="`${server()}Tasks/Question/QuestionExec/${item.ActionObjectId}`"
                       target="_blank"
                       style="text-decoration: none;"
                     >
@@ -82,7 +82,7 @@
                   <v-spacer />
                   <div v-if="item.info" class="caption mr-1">
                     <a
-                      :href="`http://wasd/SDK.Action/BinaryFiles/Download/${item.info.file}`"
+                      :href="`${server()}SDK.Action/BinaryFiles/Download/${item.info.file}`"
                       style="text-decoration: none;"
                     >
                       <v-icon small>fa fa-paperclip</v-icon>
@@ -100,7 +100,7 @@
                   <v-spacer />
                   <div v-if="item.info" class="caption mr-1">
                     <a
-                      :href="`http://wasd/SDK.Action/BinaryFiles/Download/${item.info.file}`"
+                      :href="`${server()}SDK.Action/BinaryFiles/Download/${item.info.file}`"
                       style="text-decoration: none;"
                     >
                       <v-icon small>fa fa-paperclip</v-icon>
@@ -148,6 +148,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import config from '../../../config/config'
 
 export default {
   name: 'ganttTaskHistory',
@@ -162,6 +163,9 @@ export default {
     ])
   },
   methods: {
+    server () {
+      return config.wasd_API
+    },
     isClosedInProject () {
       // const find = this.taskHistory[this.taskHistory.length - 1]
       const find = this.taskHistory.find(f => f.TypeName === 'complete')
@@ -201,6 +205,8 @@ export default {
           return 'cyan darken-3'
         case 'activate':
           return 'pink darken-4'
+        case 'unable':
+          return 'red darken-4'
         default:
           return 'blue-grey darken-1'
       }
@@ -235,6 +241,8 @@ export default {
           return 'fa fa-question'
         case 'attachcreate':
           return 'fa fa-paperclip'
+        case 'unable':
+          return 'fa fa-stop-circle'
         default:
           return ''
       }
@@ -273,6 +281,8 @@ export default {
           return 'Комментарий'
         case 'attachcreate':
           return 'Вложение'
+        case 'unable':
+          return 'Невозможно выполнить'
         default:
           return ''
       }

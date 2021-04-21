@@ -6,9 +6,10 @@
 import { gantt } from 'dhtmlx-gantt'
 import { mapGetters } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
-// import utils from '../../config/utils'
+import utils from '../../config/utils'
+import config from '../../config/config'
 import ganttinitial from './ganttinitial'
-import store from '../../store'
+import multipleFilterService from './MultipleFilterService'
 
 export default {
   name: 'GanttView',
@@ -33,7 +34,9 @@ export default {
       'users',
       'planId',
       'predecessor',
-      'successor'
+      'successor',
+      'criticalPath',
+      'project'
     ]),
     ...mapFields([
       'search',
@@ -47,11 +50,6 @@ export default {
   },
   methods: {
     async loadData () {
-      // gantt.$doFilter = function (value) {
-      //   this.search = value
-      //   gantt.refreshData()
-      // }
-      // let planId = this.planId // 10710 13838 16185
       this.$_initGanttEvents()
       //
       this.$store.dispatch('setLoading', true)
@@ -64,95 +62,346 @@ export default {
       //
       gantt = await ganttinitial.ganttInitialConfig(gantt)
       //
-      // gantt = await this.$ganttres.ganttRes(gantt)
-      //
-      // let startLoading = Date.now()
-      // gantt.attachEvent('onLoadStart', async function(){
-      //   gantt.message('Начинаем загрузку...')
-      //   gantt.serverList('dates', await planData.getTestDates('7576'))
-      // })
-      //
-      gantt.load(`http://wasd:3000/proddata/${this.planId}`)
+      gantt.load(`${config.useProxy ? config.proxyAddress : ''}http://10.175.180.201:3000/proddata/${this.planId}`)
+      // gantt.load(`http://10.175.180.201:3000/api/v2/project/plan/${this.planId}/prod`) // первая задача - проект
       //
       // gantt.config.fit_tasks = true
+      let taskId = this.$store.getters.taskId
+      // console.log(taskId, this.$route.query)
+      gantt.config.readonly = true
+      if (taskId === 'all' && this.$route.query['edit']) {
+        gantt.config.readonly = false
+        console.log('edit', true)
+      }
       gantt.init(this.$refs.gantt)
-      this.initContextMenu()
+      // this.initContextMenu()
       // gantt.parse(this.$props.tasks)
       this.$_initDataProcessor()
-      // this.$store.dispatch('setLoading', false)
+      //
     },
     async $_initGanttEvents () {
-      if (!gantt.$_eventsInitialized) {
-        //
-        gantt.attachEvent('onBeforeTaskDisplay', function (id, task) {
-          let completed = store.getters.completed
-          if (completed === true) {
-            // console.log(task.CompletePercent)
-            if (task.CompletePercent === '100') {
-              // console.log('sortTest-filter-yes')
-              return true
-            }
+      function getConstraintType (type) {
+        switch (type) {
+          case 4:
+            return 'mso' // MustStartOn Фиксированное начало 4
+          case 5:
+            return 'mfo' // MustFinishOn Фиксированное окончание 5
+          case 0:
+            return 'snet' // StartNoEarlierThan Начало не ранее 0
+          case 1:
+            return 'snlt' // StartNoLaterThan Начало не позднее 1
+          case 2:
+            return 'fnet' // FinishNoEarlierThan Окончание не ранее 2
+          case 3:
+            return 'fnlt' // FinishNoLaterThan Окончание не позднее 3
+          default:
+            return 'asap'
+        }
+      }
+      //
+      function formatWorkload (num) {
+        let ost = Math.max(Number(Number(num).toFixed(2)), Math.round(num)) % Math.min(Number(Number(num).toFixed(2)), Math.round(num))
+        if (isNaN(ost)) {
+          return 0
+        } else {
+          if (ost === 0) {
+            return num
+          } else {
+            return Number(Number(num).toFixed(2))
           }
-           return false
-        })
-        // gantt.attachEvent('onGanttRender', function () {
-        //   var element = document.getElementById('completed')
-        //   //element.onclick = element.select()
-        //   //gantt.$root.querySelector('[data-text-filter]').value = filterValue
+        }
+      }
+      if (!gantt.$_eventsInitialized) {
+        let self = this
+        // gantt.attachEvent('onTaskLoading', function (task) {
+        //   var ownerValue = task[gantt.config.resource_property]
+        //   task[gantt.config.resource_property] = task.users
+        //   // if (!task.$virtual && (!ownerValue || !Array.isArray(ownerValue) || !ownerValue.length)) {
+        //   //   task[gantt.config.resource_property] = [{ resource_id: 5, value: 0 }] // 'Unassigned' group
+        //   // }
+        //   return true
         // })
+        gantt.attachEvent('onBeforeTaskDisplay', function (id, task) {
+          let response = false
+          let aa = self.$store.getters.completed
+          let bb = self.$store.getters.overdue
+          let cc = self.$store.getters.execution
+          let dd = self.$store.getters.execDateFrom
+          let ee = self.$store.getters.execDateTo
+          let ff = self.$store.getters.milestone
+          let gg = self.$store.getters.noexecutor
+          let hh = self.$store.getters.authorUser && self.$store.getters.authorUser.length > 0 ? self.$store.getters.authorUser : null
+          let ii = self.$store.getters.executUser && self.$store.getters.executUser.length > 0 ? self.$store.getters.executUser : null
+          // eslint-disable-next-line
+          let jj = (self.$store.getters.progress[0] && self.$store.getters.progress[0] !== 0) || (self.$store.getters.progress[1] && self.$store.getters.progress[1] !== 0) ? true : false
+          let kk = self.$store.getters.reqPerk
+          let ll = self.$store.getters.riskPerk
+          let mm = self.$store.getters.reassingPerk
+          let nn = self.$store.getters.zniPerk
+          if (!aa && !bb && !cc && !dd && !ee && !ff && !gg && !ee && !hh && !ii && !jj && !kk && !ll && !mm && !nn) {
+            response = true
+          } else {
+            var isVisibleTask = multipleFilterService.applyFilterOnTask(task)
+            response = isVisibleTask
+          }
+          if (self.criticalPath) {
+            response = gantt.isCriticalTask(task)
+          }
+          return response
+        })
+        gantt.attachEvent('onGanttRender', function () {
+          let tasksCount = gantt.getVisibleTaskCount()
+          self.$store.dispatch('setTaskCount', tasksCount < 0 ? 0 : tasksCount)
+          // var element = document.getElementById('completed')
+          // element.onclick = element.select()
+          // gantt.$root.querySelector('[data-text-filter]').value = filterValue
+        })
         //
         gantt.attachEvent('onLoadEnd', () => {
           let endLoading = Date.now()
-          // Markers
-          // var dateToStr = gantt.date.date_to_str(gantt.config.task_date)
-          // var today = new Date()
-          // gantt.addMarker({
-          //   start_date: today,
-          //   css: 'today',
-          //   text: 'Сегодня',
-          //   title: dateToStr(today)
-          // })
-          // var projectstart = new Date(gantt.serverList('dates')[0].StartDate)
-          // gantt.addMarker({
-          //   start_date: projectstart,
-          //   css: 'status_line',
-          //   text: 'Старт',
-          //   title: dateToStr(projectstart)
-          // })
-          // var projectEnd = new Date(gantt.serverList('dates')[0].FinishDate)
-          // gantt.addMarker({
-          //   start_date: projectEnd,
-          //   css: 'finish',
-          //   text: 'Завершение',
-          //   title: dateToStr(projectEnd)
-          // })
+          // Begin Markers
+          var dateToStr = gantt.date.date_to_str(gantt.config.task_date)
+          var today = new Date()
+          gantt.addMarker({
+            start_date: today,
+            css: 'today',
+            text: 'Сегодня',
+            title: dateToStr(today)
+          })
+          var projectstart = new Date(gantt.serverList('dates')[0].StartDate)
+          gantt.addMarker({
+            start_date: projectstart,
+            css: 'status_line',
+            text: 'Старт',
+            title: dateToStr(projectstart)
+          })
+          var projectEnd = new Date(gantt.serverList('dates')[0].FinishDate)
+          gantt.addMarker({
+            start_date: projectEnd,
+            css: 'finish',
+            text: 'Завершение',
+            title: dateToStr(projectEnd)
+          })
+          // End Markers
           this.$store.dispatch('setEndLoading', endLoading)
           this.$store.dispatch('setLoading', false)
           console.log('Загрузка завершена за ', (endLoading - this.$store.getters.startLoading) / 1000)
+          this.$store.dispatch('setSuccess', 'Загрузка завершена. Время загрузки (в секундах): ' + Math.round(((endLoading - this.$store.getters.startLoading) / 1000) + 1 / 2))
+          // // const sorted = _.sortBy(tasksUsorted, '$index')
+          // // that.$props.tasks.data
+          // })
+          var obj = gantt.$data.tasksStore.getItems()
+          let lastTask = obj[obj.length - 1]
+          if (lastTask && lastTask.type === 'placeholder') {
+            gantt.deleteTask(lastTask.id)
+          }
+          var levels = []
           try {
-            // gantt.config.open_tree_initially = true
-            gantt.eachTask(function (task) {
-              if (task.type === gantt.config.types.subplan) {
-                task.$open = true
-              }
-            })
             gantt.render()
             let tasksUnsorted = gantt.getTaskByTime()
+            // if (lastTask && lastTask.type === 'placeholder') {
+            //   console.log('lastTask', tasksUnsorted.indexOf(lastTask), lastTask)
+            //   lastTaskIndex = lastTask.id
+            //   tasksUnsorted.splice(tasksUnsorted.indexOf(lastTask), 1)
+            // }
             for (let i = 0; i < tasksUnsorted.length; i++) {
+              //
+              let summWorkload = 0
+              //
+              levels.push(tasksUnsorted[i].$level + 1)
+              tasksUnsorted[i]._wbs = String(tasksUnsorted[i].$wbs)
+              tasksUnsorted[i].global_id_temp = tasksUnsorted[i].global_id
               tasksUnsorted[i].global_id = tasksUnsorted[i].$index + 1
-            }
-            this.$props.tasks.data = tasksUnsorted
-            gantt.eachTask(function (task) {
-              if (task.type === gantt.config.types.subplan) {
-                task.$open = false
+              if (tasksUnsorted[i].Resources !== null) {
+                let resSql = JSON.parse(tasksUnsorted[i].Resources)
+                let users = []
+                const listRes = gantt.serverList('res')
+                this.$nextTick()
+                for (let ii = 0; ii < resSql.length; ii++) {
+                  const element = resSql[ii]
+                  const res = listRes.find(f => Number(f.PlanItem) === Number(tasksUnsorted[i].id) && Number(f.id) === Number(element.id))
+                  // console.log(res)
+                  if (res) {
+                    users.push({ resource_id: element.id, value: res.capacity })
+                  }
+                }
+                tasksUnsorted[i].mainExecutor = tasksUnsorted[i].executor_id
+                tasksUnsorted[i].users = users
+                tasksUnsorted[i].executor_id = users
               }
-            })
+              //
+              if (gantt.hasChild(tasksUnsorted[i].id)) {
+                if (tasksUnsorted[i].type === 'project') {
+                  tasksUnsorted[i].type = gantt.config.types.project
+                  tasksUnsorted[i].pic_type = gantt.config.types.project
+                } else {
+                  if (tasksUnsorted[i].type === gantt.config.types.subplan) {
+                    tasksUnsorted[i].$open = false
+                  } else {
+                    tasksUnsorted[i].type = gantt.config.types.project
+                    // tasksUnsorted[i].type = gantt.config.types.task
+                    tasksUnsorted[i].pic_type = gantt.config.types.phase
+                  }
+                }
+                //
+                gantt.eachTask(function (etask) {
+                  summWorkload += etask.type === 'milestone' ? 0 : etask.workload
+                }, tasksUnsorted[i].id)
+              } else {
+                summWorkload = tasksUnsorted[i].type === 'milestone' ? 0 : tasksUnsorted[i].workload
+              }
+              tasksUnsorted[i].workload = tasksUnsorted[i].type === 'milestone' ? 0 : tasksUnsorted[i].workload
+              tasksUnsorted[i].isImported = false
+              // if (Math.max(Number(Number(summWorkload).toFixed(2)), Math.round(summWorkload)) % Math.min(Number(Number(summWorkload).toFixed(2)), Math.round(summWorkload)) === 0) {
+              //   tasksUnsorted[i].workloadstring = tasksUnsorted[i].type === 'milestone' ? '0' : String(Math.round(summWorkload))
+              // } else {
+              //   tasksUnsorted[i].workloadstring = tasksUnsorted[i].type === 'milestone' ? '0' : (Number(Number(summWorkload).toFixed(2)) > 0 ? String(Number(summWorkload).toFixed(2)).replace('.', ',') : '0')
+              // }
+              tasksUnsorted[i].workloadstring = tasksUnsorted[i].type === 'milestone' ? '0' : String(formatWorkload(summWorkload)).replace('.', ',')
+              //
+              // if (gantt.hasChild(tasksUnsorted[i].id) && tasksUnsorted[i].type === 'project') {
+              //   tasksUnsorted[i].type = gantt.config.types.project
+              //   tasksUnsorted[i].pic_type = gantt.config.types.project
+              // }
+              // if (gantt.hasChild(tasksUnsorted[i].id) && tasksUnsorted[i].type !== 'project') {
+              //   if (tasksUnsorted[i].type === gantt.config.types.subplan) {
+              //     tasksUnsorted[i].$open = false
+              //   } else {
+              //     tasksUnsorted[i].type = gantt.config.types.project
+              //     // tasksUnsorted[i].type = gantt.config.types.task
+              //     tasksUnsorted[i].pic_type = gantt.config.types.phase
+              //   }
+              // }
+              //
+              tasksUnsorted[i].constraint_type = tasksUnsorted[i].ConstraintType !== null ? getConstraintType(Number(tasksUnsorted[i].ConstraintType)) : 'asap'
+              if (tasksUnsorted[i].ConstraintType !== null) {
+                tasksUnsorted[i].constraint_date = gantt.getClosestWorkTime({ date: gantt.date.parseDate(new Date(tasksUnsorted[i].ConstraintDate), '%Y-%m-%d %H:%i:%s'), dir: 'future' })
+              }
+              if (!tasksUnsorted[i].global_id) {
+                tasksUnsorted[i].global_id = Number(tasksUnsorted[i].global_id_temp)
+              }
+            }
+            //
+            let level = Array.from(new Set(levels))
+            // console.log(level)
+            this.$store.dispatch('setLevels', level)
+            //
+            // var showBaselines = self.$store.getters.predictDate
+            // console.log('showBaselines2s: ', showBaselines)
+            //
+            this.$props.tasks.data = tasksUnsorted
             gantt.refreshData()
+            let allAuthors = [...new Set(tasksUnsorted.map(item => item.owner_id))]
+            const resourcesUsers = gantt.serverList('res')
+            let allExecutors = [...new Set(resourcesUsers.map(item => item.id))]
+            this.$store.dispatch('setAllAuthors', allAuthors)
+            this.$store.dispatch('setAllExecutors', allExecutors)
+            this.$store.dispatch('setAllTasksCount', tasksUnsorted.length)
           } catch (error) {
             console.log(error)
           }
           // gantt.ext.zoom.zoomOut()
+          // Подсветка задачи, если переход выполнен из карточки задачи
+          let tasks = obj
+          let taskId = this.$store.getters.taskId
+          if (taskId && taskId !== 'all' && taskId !== 'edit') {
+            const findTask = tasks.find(f => f.task_id === taskId)
+            if (findTask) {
+              // eslint-disable-next-line
+              gantt.selectTask(findTask.id)
+              // eslint-disable-next-line
+              gantt.showTask(findTask.id)
+            }
+          }
+          // Конец Подсветка задачи, если переход выполнен из карточки задачи
         })
+        // let self = this
+        // gantt.attachEvent('onTaskClick', (id) => {
+        //   function getPredecessor (id) {
+        //     var taskObj = gantt.getTask(id)
+        //     var predecessors = taskObj.$target || null
+        //     var target = {}
+        //     var targets = []
+        //     if (predecessors && predecessors.length > 1) {
+        //       for (let index = 0; index < predecessors.length; index++) {
+        //         targets.push(gantt.getLink(predecessors[index]).source)
+        //       }
+        //     } else {
+        //       target = gantt.getLink(predecessors[0]) || null
+        //     }
+        //     return targets.length > 0 ? targets : target ? target.source : null
+        //   }
+        //   function getSuccessor (id) {
+        //     var taskObj = gantt.getTask(id)
+        //     var successors = taskObj.$source || null
+        //     var target = {}
+        //     var targets = []
+        //     if (successors && successors.length > 1) {
+        //       for (let index = 0; index < successors.length; index++) {
+        //         targets.push(gantt.getLink(successors[index]).target)
+        //       }
+        //     } else {
+        //       target = gantt.getLink(successors[0]) || null
+        //     }
+        //     return targets.length > 0 ? targets : target ? target.target : null
+        //   }
+        //   var pred = getPredecessor(id)
+        //   if (!pred) {
+        //     console.log('0')
+        //     self.$store.dispatch('setPredecessor', false)
+        //   } else {
+        //     console.log('1')
+        //     self.$store.dispatch('setPredecessor', true)
+        //     if (Array.isArray(pred)) {
+        //       var predecessors = []
+        //       for (let index = 0; index < pred.length; index++) {
+        //         const element = pred[index]
+        //         // eslint-disable-next-line
+        //         const task = gantt.getTask(element)
+        //         // eslint-disable-next-line
+        //         predecessors.push(task)
+        //       }
+        //       console.log('2')
+        //       self.$store.dispatch('setPredecessorsTasks', predecessors)
+        //     } else {
+        //       var predecessor = []
+        //       // eslint-disable-next-line
+        //       const task = gantt.getTask(pred)
+        //       // eslint-disable-next-line
+        //       predecessor.push(task)
+        //       console.log('3')
+        //       self.$store.dispatch('setPredecessorsTasks', predecessor)
+        //     }
+        //   }
+        //   var succ = getSuccessor(id)
+        //   if (!succ) {
+        //     console.log('00')
+        //     self.$store.dispatch('setSuccessor', false)
+        //   } else {
+        //     console.log('01')
+        //     self.$store.dispatch('setSuccessor', true)
+        //     if (Array.isArray(succ)) {
+        //       var successors = []
+        //       for (let index = 0; index < succ.length; index++) {
+        //         const element = succ[index]
+        //         // eslint-disable-next-line
+        //         const task = gantt.getTask(element)
+        //         // eslint-disable-next-line
+        //         successors.push(task)
+        //       }
+        //       console.log('02')
+        //       self.$store.dispatch('setSuccessorsTasks', successors)
+        //     } else {
+        //       var successor = []
+        //       // eslint-disable-next-line
+        //       const task = gantt.getTask(succ)
+        //       // eslint-disable-next-line
+        //       successor.push(task)
+        //       console.log('03')
+        //       self.$store.dispatch('setSuccessorsTasks', successor)
+        //     }
+        //   }
+        // })
         gantt.attachEvent('onTaskSelected', (id) => {
           let task = gantt.getTask(id)
           this.$emit('task-selected', task)
@@ -160,6 +409,7 @@ export default {
           this.$store.dispatch('setSelectedTask', task)
           this.$store.dispatch('setSelectedTaskId', id)
           this.selectedTaskId = id
+          // console.log(self.project)
           // selectedTaskId
         })
         gantt.attachEvent('onTaskIdChange', (id, newId) => {
@@ -171,7 +421,6 @@ export default {
             console.log('onTaskIdChange', task)
           }
         })
-        let self = this
         gantt.attachEvent('onTaskDblClick', function (id, e) {
           function getPredecessor (id) {
             var taskObj = gantt.getTask(id)
@@ -254,22 +503,39 @@ export default {
           }
           // var formatFunc = gantt.date.date_to_str('%Y-%m-%d')
           // var date = formatFunc(new Date(2013, 05, 29))
-          self.$store.dispatch('setTaskRequirements', task.WASD_Requirement)
+          var workload = []
+          var taskResources = task.executor_id || []
+          var workloadResources = gantt.serverList('workload')
+          for (let r = 0; r < taskResources.length; r++) {
+            const rId = taskResources[r].resource_id
+            var filterWorkload = workloadResources.filter(f => Number(f.userId) === Number(rId))
+            workload = workload.concat(filterWorkload)
+          }
+          self.$store.dispatch('setWorkload', workload)
+          self.$store.dispatch('setIsMainTask', true)
+          self.$store.dispatch('setTaskRequirements', task.wasd_Requirement)
           self.$store.dispatch('setTaskHistory', { id: task.task_id, date: task.CreationDate })
           self.$store.dispatch('setTabDialogTask', null)
           self.$store.dispatch('setTaskDialogVisible', true)
           return false
         })
+        gantt.attachEvent('onLinkClick', function (id, e) {
+          console.log(gantt.getLink(id))
+        })
+        // load workload resources
+        var workload = await utils.getWorkloadPortfolio()
+        // self.$store.dispatch('setWorkload', workload)
+        gantt.serverList('workload', workload)
         gantt.$_eventsInitialized = true
       }
     },
     $_initDataProcessor () {
-      if (!gantt.$_dataProcessorInitialized) {
-        gantt.createDataProcessor((entity, action, data, id) => {
-          this.$emit(`${entity}-updated`, id, action, data)
-        })
-        gantt.$_dataProcessorInitialized = true
-      }
+      // if (!gantt.$_dataProcessorInitialized) {
+      //   gantt.createDataProcessor((entity, action, data, id) => {
+      //     this.$emit(`${entity}-updated`, id, action, data)
+      //   })
+      //   gantt.$_dataProcessorInitialized = true
+      // }
     },
     initContextMenu () {
       const self = this
@@ -386,7 +652,7 @@ export default {
               taskItemInContext = clickInsideElement(e, taskItemClassName) // gantt_cell gantt_tree_content gantt_tree_indent gantt_task_content
               if (taskItemInContext) {
                 var id = taskItemInContext.getAttribute('data-task-id')
-                console.log('data-task-id', id)
+                // console.log('data-task-id', id)
                 // setSelectedDialogTask
                 var currentTask = gantt.getTask(id)
                 self.$store.dispatch('setSelectedDialogTask', currentTask)
@@ -532,10 +798,10 @@ export default {
               case 'view':
                 // gantt.showLightbox(id)
                 var pred = getPredecessor(id)
-                console.log('predecessor', pred)
+                // console.log('predecessor', pred)
                 if (!pred) {
                   self.$store.dispatch('setPredecessor', false)
-                  console.log('Нет предшественника', self.predecessor)
+                  // console.log('Нет предшественника', self.predecessor)
                 } else {
                   self.$store.dispatch('setPredecessor', true)
                   if (Array.isArray(pred)) {
@@ -549,7 +815,7 @@ export default {
                       var formatFunc = gantt.date.date_to_str('%d.%m.%Y')
                       predecessors.push(task)
                     }
-                    console.log('predecessors', predecessors)
+                    // console.log('predecessors', predecessors)
                     self.$store.dispatch('setPredecessorsTasks', predecessors)
                     // self.$store.dispatch('setDialogCaption', 'Выберите предшественника для перехода')
                     // self.$store.dispatch('setTaskDialogVisible', true)
@@ -562,7 +828,7 @@ export default {
                     // eslint-disable-next-line
                     var formatFunc = gantt.date.date_to_str('%d.%m.%Y')
                     predecessor.push(task)
-                    console.log('predecessors', predecessor)
+                    // console.log('predecessors', predecessor)
                     self.$store.dispatch('setPredecessorsTasks', predecessor)
                     // self.$store.dispatch('setTaskDialogVisible', true)
                     // gantt.showTask(pred)
@@ -572,10 +838,10 @@ export default {
                 }
                 //
                 var succ = getSuccessor(id)
-                console.log(succ)
+                // console.log(succ)
                 if (!succ) {
                   self.$store.dispatch('setSuccessor', false)
-                  console.log('Нет последователя', self.successor)
+                  // console.log('Нет последователя', self.successor)
                 } else {
                   self.$store.dispatch('setSuccessor', true)
                   if (Array.isArray(succ)) {
@@ -589,7 +855,7 @@ export default {
                       var formatFunc = gantt.date.date_to_str('%d.%m.%Y')
                       successors.push(task)
                     }
-                    console.log('successors', successors)
+                    // console.log('successors', successors)
                     self.$store.dispatch('setSuccessorsTasks', successors)
                     // self.$store.dispatch('setDialogCaption', 'Выберите последователя для перехода')
                     // self.$store.dispatch('setTaskDialogVisible', true)
@@ -602,7 +868,7 @@ export default {
                     // eslint-disable-next-line
                     var formatFunc = gantt.date.date_to_str('%d.%m.%Y')
                     successor.push(task)
-                    console.log('successors', successor)
+                    // console.log('successors', successor)
                     self.$store.dispatch('setSuccessorsTasks', successor)
                     // self.$store.dispatch('setTaskDialogVisible', true)
                     // gantt.showTask(succ)
@@ -611,6 +877,21 @@ export default {
                   }
                 }
                 // self.$store.dispatch('setDialogCaption', 'Просмотр задачи')
+                const task = gantt.getTask(id)
+
+                var workload = []
+                var taskResources = task.executor_id || []
+                var workloadResources = gantt.serverList('workload')
+                for (let r = 0; r < taskResources.length; r++) {
+                  const rId = taskResources[r].resource_id
+                  var filterWorkload = workloadResources.filter(f => Number(f.userId) === Number(rId))
+                  workload = workload.concat(filterWorkload)
+                }
+                self.$store.dispatch('setWorkload', workload)
+                self.$store.dispatch('setIsMainTask', true)
+                self.$store.dispatch('setTaskRequirements', task.wasd_Requirement)
+                self.$store.dispatch('setTaskHistory', { id: task.task_id, date: task.CreationDate })
+                self.$store.dispatch('setTabDialogTask', null)
                 self.$store.dispatch('setTaskDialogVisible', true)
                 break
               case 'predecessor':
@@ -675,165 +956,12 @@ export default {
 </script>
 
 <style>
-  /* @import "~dhtmlx-gantt/codebase/dhtmlxgantt.css"; */
   /* @import "~dhtmlx-gantt/codebase/skins/dhtmlxgantt_meadow.css"; */
-  @import "~dhtmlx-gantt/codebase/skins/dhtmlxgantt_skyblue.css";
+  @import '~dhtmlx-gantt/codebase/skins/dhtmlxgantt_skyblue.css';
   /* @import "~dhtmlx-gantt/codebase/skins/dhtmlxgantt_broadway.css"; */
-  .ganttview {
-    height: 100%;
-  }
-  html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-  .container {
-    height: 100%;
-    width: 100%;
-  }
-  .left-container {
-    overflow: hidden;
-    position: relative;
-    height: 100%;
-  }
-  .planTask {
-    background-image: url(http://wasd/Content/js/icons/project-task.png);
-  }
-  .planSubPlan {
-    background-image: url(http://wasd/Content/js/icons/subproject.png);
-  }
-  .planMilestone {
-    background-image: url(http://wasd/Content/js/icons/milestone.png);
-  }
-  .planPhaseTask {
-    background-image: url(http://wasd/Content/js/icons/phase-task.png);
-  }
-  .task_groups {
-    background-color: rgb(255, 153, 0) !important;
-  }
-
-  .task_groups .gantt_task_progress {
-    background-color: rgb(214, 129, 1);
-    opacity: 0.6;
-  }
-  /* .hide_project_progress_drag .gantt_task_progress_drag {
-    visibility: hidden;
-  } */
-  .gantt_row_placeholder {
-    visibility: hidden;
-  }
-  .subplan_task {
-    border: 2px solid rgba(138, 42, 106, 0.342);
-    color: #d8dee4;
-    background: rgb(206, 60, 157);
-  }
-  .subplan_task .gantt_task_progress {
-    background: rgba(129, 38, 99, 0.651);
-  }
-  /* .phase_task {
-    border: 2px solid rgba(18, 124, 32, 0.342);
-    color: #dee1e4;
-    background: rgba(50, 173, 50, 0.719);
-  }
-  .phase_task .gantt_task_progress {
-    background: rgba(26, 133, 62, 0.651);
-  } */
-  .green .gantt_cell, .odd.green .gantt_cell, .green .gantt_task_cell, .odd.green .gantt_task_cell {
-    border: 0px;
-    color: rgba(224, 241, 224, 0.9);
-    background-color: rgba(243, 243, 243, 0.9);
-  }
-  .expired_inwork .gantt_cell, .odd.expired_inwork .gantt_cell, .expired_inwork .gantt_task_cell, .odd.expired_inwork .gantt_task_cell {
-    background-color: rgba(243, 228, 92, 0.25);
-  }
-  .expired_tasks .gantt_cell, .odd.expired_tasks .gantt_cell, .expired_tasks .gantt_task_cell, .odd.expired_tasks .gantt_task_cell {
-    background-color: rgba(228, 198, 190, 0.25);
-  }
-  .weekend {
-    background: #f4f7f4 !important;
-  }
-  .gantt_selected .weekend {
-    background:#FFF3A1 !important;
-  }
-  /*  */
-  .phase_task {
-    border: 1px solid rgba(12, 66, 19, 0.342);
-    color: #dee1e4;
-    background: rgba(50, 173, 50, 0.719);
-  }
-  .phase_task .gantt_task_progress {
-    background: rgba(26, 133, 62, 0.651);
-  }
-  /*  */
-  .custom-project {
-    position: absolute;
-    height: 8px;
-    color: #ffffff;
-    background-color: rgb(20, 114, 51);
-  }
-  .custom-project .gantt_task_progress {
-    background-color: rgb(110, 121, 114) !important;
-  }
-  .custom-project div {
-    position: absolute;
-  }
-  .project-left, .project-right {
-    top: 8px;
-    background-color: transparent;
-    border-style: solid;
-    width: 0px;
-    height: 0px;
-  }
-  .project-left {
-    left: 0px;
-    border-width: 0px 0px 8px 7px;
-    border-top-color: transparent;
-    border-right-color: transparent !important;
-    border-bottom-color: transparent !important;
-    border-left-color: rgb(20, 114, 51) !important;
-  }
-  .project-right {
-    right: 0px;
-    border-width: 0px 7px 8px 0px;
-    border-top-color: transparent;
-    border-right-color: rgb(20, 114, 51);
-    border-bottom-color: transparent !important;
-    border-left-color: transparent;
-  }
-  /*  */
-  .gantt_link_arrow {
-    border-color: rgb(20, 114, 51);
-  }
-  .gantt_task_line.gantt_milestone .gantt_task_content {
-    height: 16px !important;
-    line-height: 18px !important;
-    width: 16px !important;
-    margin-top: 2px !important;
-    margin-left: 2px !important;
-  }
-  .gantt_link_arrow_right {
-    border-width: 3px 0 4px 6px !important;
-    margin-top: 0px !important;
-  }
-  .gantt_link_arrow_left {
-    border-width: 3px 6px 3px 0 !important;
-    margin-top: 0px !important;
-  }
-  #search {
-    width: 290px;
-    height: 26px;
-    margin-left: 25px;
-    padding: 0px 3px;
-    border: 1px solid #90A4AE;
-    border-radius: 4px;
-    font-size: 12px;
-    background-color: #ECEFF1;
-    background-image: url(https://d2zjg0qo565n2.cloudfront.net/sites/default/files/2016-rebrand/header-icons/Homepage_Search_Icon.png);
-    background-position: 2px 2px;
-    background-repeat: no-repeat;
-    padding-left: 26px;
-  }
-  #search:focus {
-    border-radius: 4px;
-  }
+  @import '../../styles/gantt.css';
+  @import '../../styles/controls_styles.css';
+  /* Chart.js */
+  @-webkit-keyframes chartjs-render-animation{from{opacity:0.99}to{opacity:1}}
+  @keyframes chartjs-render-animation{from{opacity:0.99}to{opacity:1}}.chartjs-render-monitor{-webkit-animation:chartjs-render-animation 0.001s;animation:chartjs-render-animation 0.001s;}
 </style>

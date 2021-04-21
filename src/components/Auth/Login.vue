@@ -91,7 +91,7 @@ export default {
         // }
         this.$store.dispatch('ldapLogin', { user: this.email, pwd: this.password }) // loginUser
           .then(() => {
-            this.$cookie.set('user_id', this.user, { expires: 1 })
+            this.$cookie.set('user_id', this.user, { expires: 365 })
             this.$router.push('/')
           }).catch(() => {
           })

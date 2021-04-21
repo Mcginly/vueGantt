@@ -4,6 +4,7 @@ import Auth from './auth'
 import Shared from './shared'
 import Data from './data'
 import Settings from './settings'
+import Filters from './filters'
 
 Vue.use(Vuex)
 
@@ -12,6 +13,7 @@ export default new Vuex.Store({
     Shared,
     Auth,
     Data,
-    Settings
+    Settings,
+    Filters
   }
 })

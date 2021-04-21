@@ -1,10 +1,14 @@
 module.exports = {
-  "presets": [
+  'presets': [
     [
-      "@vue/app",
+      '@vue/app',
       {
-        "useBuiltIns": "entry"
+        'useBuiltIns': 'entry'
       }
     ]
+  ],
+  'plugins': [
+    '@babel/plugin-proposal-optional-chaining',
+    '@babel/plugin-proposal-nullish-coalescing-operator'
   ]
 }

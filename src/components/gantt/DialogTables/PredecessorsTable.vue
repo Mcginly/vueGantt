@@ -6,7 +6,7 @@
     class="elevation-1"
     dense
   >
-    <template v-slot:item.action="{ item }">
+    <template v-slot:[`item.action`]="{ item }">
       <v-tooltip
         bottom
         open-delay="600"
@@ -43,7 +43,7 @@ export default {
         value: 'global_id'
       },
       {
-        text: 'Задача',
+        text: 'Предшественники',
         align: 'start',
         sortable: false,
         value: 'text'
@@ -64,6 +64,7 @@ export default {
   },
   methods: {
     locateTask (task) {
+      this.$store.dispatch('setIsMainTask', false)
       // eslint-disable-next-line
       gantt.selectTask(task.id)
       // eslint-disable-next-line

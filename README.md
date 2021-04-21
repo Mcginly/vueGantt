@@ -1,4 +1,4 @@
-# WASD-bi-view
+# wasd-bi-view
 
 ## Project setup
 ```

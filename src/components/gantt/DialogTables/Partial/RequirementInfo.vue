@@ -124,7 +124,7 @@
             >
               <template v-slot:activator="{ on, attrs }">
                 <a
-                  :href="`http://wasd/Documents/Document/DownloadCurrentVersion/${item.Contract}`"
+                  :href="`${server()}/Documents/Document/DownloadCurrentVersion/${item.Contract}`"
                   target="_blank"
                   style="text-decoration:none;"
                   v-bind="attrs"
@@ -141,7 +141,7 @@
           <v-list-item-content>
             <v-list-item-subtitle class="caption">Договор</v-list-item-subtitle>
             <v-list-item-title>
-              <a :href="`http://wasd/Documents/Document/View/${item.Contract}`" target="_blank" style="text-decoration:none;">{{ item.ContractName }}</a></v-list-item-title>
+              <a :href="`${server()}/Documents/Document/View/${item.Contract}`" target="_blank" style="text-decoration:none;">{{ item.ContractName }}</a></v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-col>
@@ -180,6 +180,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+// import config from '../../../../config/config'
 
 export default {
   name: 'requirementInfo',
@@ -282,6 +283,13 @@ export default {
       set () {
         //
       }
+    }
+  },
+  methods: {
+    server () {
+      var host = 'http://' + window.location.hostname
+      // return config.wasd_API
+      return host
     }
   }
 }

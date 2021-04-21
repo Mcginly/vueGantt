@@ -8,9 +8,19 @@ export default {
     projects: [],
     taskHistory: null,
     historyLoading: false,
-    taskRequirements: null
+    taskRequirements: null,
+    workload: null,
+    project: null,
+    publicAuthor: null,
+    publicDate: null
   },
   mutations: {
+    setProject (state, payload) {
+      state.project = payload
+    },
+    setWorkload (state, payload) {
+      state.workload = payload
+    },
     setHistoryLoading (state, payload) {
       state.historyLoading = payload
     },
@@ -25,9 +35,21 @@ export default {
     },
     setTaskRequirements (state, payload) {
       state.taskRequirements = payload
+    },
+    setPublicAuthor (state, payload) {
+      state.publicAuthor = payload
+    },
+    setPublicDate (state, payload) {
+      state.publicDate = payload
     }
   },
   actions: {
+    setProject ({ commit }, payload) {
+      commit('setProject', payload)
+    },
+    setWorkload ({ commit }, payload) {
+      commit('setWorkload', payload)
+    },
     setHistoryLoading ({ commit }, payload) {
       commit('setHistoryLoading', payload)
     },
@@ -39,7 +61,7 @@ export default {
         try {
           const resp = await axios.get(`${config.useProxy ? config.proxyAddress : ''}${config.API_ADDRESS}/proddata/requirements/${payload}`)
           commit('setTaskRequirements', resp.data.length > 0 ? resp.data : null)
-          console.log('setTaskRequirements', resp.data.length > 0 ? resp.data : null)
+          // console.log('setTaskRequirements', resp.data.length > 0 ? resp.data : null)
         } catch (e) {
           commit('setTaskRequirements', null)
         }
@@ -53,8 +75,9 @@ export default {
         try {
           commit('setHistoryLoading', true)
           // console.log(payload)
-          let resp = await axios.get(`${config.useProxy ? config.proxyAddress : ''}${config.API_ADDRESS}/proddata/taskhistory/${payload.id}/${payload.date}`)
-          let respHistory = resp.data
+          const resp = await axios.get(`${config.useProxy ? config.proxyAddress : ''}${config.API_ADDRESS}/proddata/taskhistory/${payload.id}/${payload.date}`)
+          const rawResp = new Set(resp.data)
+          let respHistory = [...rawResp]
           let history = []
           for (let i = 0; i < respHistory.length; i++) {
             let element = respHistory[i]
@@ -82,15 +105,17 @@ export default {
                 })
               }
               element.items = items
-              let workUnit = respHistory.filter(f => f.UnitOfWorkUid === element.UnitOfWorkUid)
+              const workUnit = respHistory.filter(f => f.UnitOfWorkUid === element.UnitOfWorkUid)
+              const commentWork = respHistory.filter(f => f.UnitOfWorkUid === element.UnitOfWorkUid && f.TypeName === 'commentcreate' && f.comment)
+              // console.log(payload.id, payload.date, commentWork)
               if (workUnit.length > 1) {
-                const comment = workUnit.find(c => c.Object === 'Комментарии')
+                // const comment = workUnit.find(c => c.Object === 'Комментарии')
+                const comment = commentWork.find(c => c.Object === 'Комментарии')
                 const attach = workUnit.find(c => c.Object === 'Вложение')
-                // console.log('attach', attach)
                 let firstUnit = workUnit[0]
                 const lastUnit = workUnit[workUnit.length - 1]
                 firstUnit.info = lastUnit.info
-                firstUnit.comment = comment ? comment.info : ''
+                firstUnit.comment = comment ? comment.comment : ''
                 firstUnit.attach = attach ? attach.attach : null
                 history.push(firstUnit)
               } else {
@@ -121,7 +146,7 @@ export default {
       } else {
         commit('clearError')
         commit('setLoading', true)
-        axios.post(`${config.API_LOCAL_ADDRESS}${config.API_GET_PORTFOLIO}`, payload, {
+        axios.post(`${config.API_ADDRESS}${config.API_GET_PORTFOLIO}`, payload, {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -136,9 +161,21 @@ export default {
             commit('setError', error.Message)
           })
       }
+    },
+    setPublicAuthor ({ commit }, payload) {
+      commit('setPublicAuthor', payload)
+    },
+    setPublicDate ({ commit }, payload) {
+      commit('setPublicDate', payload)
     }
   },
   getters: {
+    project (state) {
+      return state.project
+    },
+    workload (state) {
+      return state.workload
+    },
     taskRequirements (state) {
       return state.taskRequirements
     },
@@ -153,6 +190,12 @@ export default {
     },
     portfolio (state) {
       return state.portfolio
+    },
+    publicAuthor (state) {
+      return state.publicAuthor
+    },
+    publicDate (state) {
+      return state.publicDate
     }
   }
 }

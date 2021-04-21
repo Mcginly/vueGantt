@@ -17,31 +17,31 @@
         <requirementInfo :item="item" />
       </td>
     </template>
-    <template v-slot:item.action="{ item }">
+    <template v-slot:[`item.action`]="{ item }">
       <v-tooltip
         bottom
         open-delay="600"
       >
         <template v-slot:activator="{ on, attrs }">
           <a
-            :href="`http://wasd/Common/Catalogs/ViewItem/${item.Id}?uid=6513f28b-13a3-4e74-aa8f-010353c88ef2`"
+            :href="`${server()}/Common/Catalogs/ViewItem/${item.Id}?uid=6513f28b-13a3-4e74-aa8f-010353c88ef2`"
             target="_blank"
             v-bind="attrs"
             v-on="on"
           >
-            <img src="http://wasd/Content/Images/x16/process.png" width="16" height="16" class="mt-1" />
+            <img :src="`${server()}/Content/Images/x16/process.png`" width="16" height="16" class="mt-1" />
           </a>
         </template>
-        <span>Открыть в WASD</span>
+        <span>Открыть в wasd</span>
       </v-tooltip>
     </template>
     <!-- <template v-slot:item.StartPoint="{ item }">
       {{ new Date(item.StartPoint).toLocaleDateString() }}
     </template> -->
-    <template v-slot:item.Deadline="{ item }">
+    <template v-slot:[`item.Deadline`]="{ item }">
       {{ new Date(item.Deadline).toLocaleDateString() }}
     </template>
-    <template v-slot:item.Delay="{ item }">
+    <template v-slot:[`item.Delay`]="{ item }">
       {{ item.Delay }}
     </template>
   </v-data-table>
@@ -50,6 +50,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import requirementInfo from './Partial/RequirementInfo'
+// import config from '../../../config/config'
 
 export default {
   name: 'ganttRequirementsTask',
@@ -108,6 +109,10 @@ export default {
     ])
   },
   methods: {
+    server () {
+      // return config.wasd_API
+      return 'http://' + window.location.hostname
+    },
     itemClass (item) {
       switch (item.Status) {
         case 0:

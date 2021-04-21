@@ -69,12 +69,50 @@ export default new Router({
       beforeEnter: AuthGuard
     },
     {
-      path: '/projectplan/:plan_id',
+      path: '/wiki',
+      name: 'wiki',
+      // component: Home,
+      component: () => import(/* webpackChunkName: "wiki" */ '../components/wiki/MainWiki.vue'),
+      beforeEnter: AuthGuard
+    },
+    {
+      path: '/reports/requirements',
+      name: 'requirements',
+      component: () => import(/* webpackChunkName: "requirements" */ '../components/reports/Requirements.vue'),
+      beforeEnter: AuthGuard
+    },
+    {
+      path: '/kanban',
+      name: 'kanban',
+      // component: Home,
+      component: () => import(/* webpackChunkName: "kanban" */ '../components/kanban/Kanban.vue'),
+      beforeEnter: AuthGuard
+    },
+    {
+      path: '/wiki/view/:article_id',
+      name: 'article',
+      // route level code-splitting
+      // this generates a separate chunk (about.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import(/* webpackChunkName: "article" */ '../components/wiki/ViewWikiArticle.vue'),
+      beforeEnter: AuthGuard
+    },
+    {
+      path: '/wiki/edit/:article_id',
+      name: 'editarticle',
+      // route level code-splitting
+      // this generates a separate chunk (about.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import(/* webpackChunkName: "editarticle" */ '../components/wiki/EditWikiArticle.vue'),
+      beforeEnter: AuthGuard
+    },
+    {
+      path: '/projectplan/:plan_id/:task_id',
       name: 'plan',
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "history" */ '../components/gantt/GanttApp.vue'),
+      component: () => import(/* webpackChunkName: "plan" */ '../components/gantt/GanttApp.vue'),
       beforeEnter: AuthGuard
     },
     {
