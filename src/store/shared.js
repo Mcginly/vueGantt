@@ -19,14 +19,6 @@ export default {
     selectedTask: null,
     selectedDialogTask: null,
     taskeditform: null,
-    // taskeditform: {
-    //   text: '',
-    //   description: '',
-    //   dateRange: [],
-    //   progress: 0,
-    //   duration: 0,
-    //   type: ''
-    // },
     tabDialogTask: null,
     showToolbar: false,
     showPanel: false,

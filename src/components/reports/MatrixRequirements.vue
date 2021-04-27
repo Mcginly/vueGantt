@@ -16,18 +16,6 @@
             style="flex-wrap: nowrap;"
             justify="space-between"
           >
-            <!-- <v-autocomplete
-              v-model="reportQuery.projectOffice"
-              class="pa-2"
-              :items="projectOfficeData"
-              item-text="Name"
-              item-value="Id"
-              dense
-              outlined
-              label="Проектный офис"
-              clearable
-              color="wasdmedium"
-            /> -->
             <v-autocomplete
               v-model="reportQuery.project"
               class="pa-2"
