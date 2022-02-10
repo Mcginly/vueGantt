@@ -52,7 +52,7 @@
     "eslint-config-vuetify": "^0.4.1",
     "eslint-plugin-vue": "^5.0.0",
     "font-awesome": "^4.7.0",
-    "node-sass": "^4.14.1",
+    "node-sass": "^7.0.0",
     "sass-loader": "^8.0.0",
     "typeface-roboto": "^1.1.13",
     "vue-cli-plugin-vuetify": "^2.0.2",
